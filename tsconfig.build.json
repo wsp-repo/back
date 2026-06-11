@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": true,
+    "incremental": false
+  },
+  "exclude": [
+    "./**/*spec.ts",
+    "./node_modules",
+    "./dist"
+  ]
+}
