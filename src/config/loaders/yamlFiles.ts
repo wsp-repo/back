@@ -51,7 +51,7 @@ export class ConfigYamlFiles implements ConfigLoader {
     const files = [
       this.checkFilePath(resolve(this.rootPath, defaultFileName), true),
       this.checkFilePath(resolve(this.rootPath, nodeEnvFileName), false),
-      configYaml ? this.checkFilePath(configYaml, false) : undefined,
+      configYaml ? this.checkFilePath(configYaml, true) : undefined,
     ];
 
     // просто безопасный обход TS-ошибки
