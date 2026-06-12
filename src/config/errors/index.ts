@@ -35,3 +35,16 @@ export class ConfigYamlError extends CoreError {
     );
   }
 }
+
+export class ConfigEnvError extends CoreError {
+  public readonly code = 'CONFIG_ENV_ERROR';
+
+  constructor(envName: string, error: unknown, details?: unknown) {
+    const baseError = getBaseError(error, details);
+
+    super(
+      `Ошибка ENV-переменной '${envName}'. ${baseError.message}`,
+      baseError.details,
+    );
+  }
+}
