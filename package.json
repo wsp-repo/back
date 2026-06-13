@@ -1,6 +1,6 @@
 {
   "name": "@zalib/back",
-  "version": "11.1.3",
+  "version": "11.1.4",
   "description": "Platform backend package",
   "license": "UNLICENSED",
   "engines": {
