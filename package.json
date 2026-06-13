@@ -1,6 +1,6 @@
 {
   "name": "@zalib/back",
-  "version": "11.1.2",
+  "version": "11.1.4",
   "description": "Platform backend package",
   "license": "UNLICENSED",
   "engines": {
@@ -11,17 +11,17 @@
     "dist/**/*"
   ],
   "exports": {
-    "./config/*": {
-      "default": "./dist/config/*.js",
-      "types": "./dist/config/*.d.ts"
+    "./config": {
+      "default": "./dist/config/index.js",
+      "types": "./dist/config/index.d.ts"
     },
-    "./helpers/*": {
-      "default": "./dist/helpers/*.js",
-      "types": "./dist/helpers/*.d.ts"
+    "./helpers": {
+      "default": "./dist/helpers/index.js",
+      "types": "./dist/helpers/index.d.ts"
     },
-    "./typebox/*": {
-      "default": "./dist/typebox/*.js",
-      "types": "./dist/typebox/*.d.ts"
+    "./typebox": {
+      "default": "./dist/typebox/index.js",
+      "types": "./dist/typebox/index.d.ts"
     }
   },
   "repository": {
@@ -29,7 +29,7 @@
     "url": "git+https://github.com/wsp-repo/back.git"
   },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "clean": "rimraf dist",
     "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
     "lint": "eslint ./src --quiet",
