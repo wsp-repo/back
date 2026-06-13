@@ -29,7 +29,7 @@
     "url": "git+https://github.com/wsp-repo/back.git"
   },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "clean": "rimraf dist",
     "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
     "lint": "eslint ./src --quiet",
