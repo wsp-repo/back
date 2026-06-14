@@ -4,8 +4,7 @@ import { resolve } from 'path';
 import { isObject } from '@zalib/core';
 import { parse } from 'yaml';
 
-import { fsStatSafe, getRootPath } from 'src/helpers';
-
+import { fsStatSafe, getRootPath } from '../../helpers';
 import { ConfigYamlError } from '../errors';
 import { ConfigObject, ConfigStorage } from '../storage';
 
