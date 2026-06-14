@@ -29,7 +29,7 @@
     "url": "git+https://github.com/wsp-repo/back.git"
   },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
     "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
     "lint": "eslint ./src --quiet",
@@ -49,7 +49,7 @@
     "@nestjs/platform-fastify": "11.1.24",
     "@nestjs/swagger": "11.4.4",
     "@nestjs/websockets": "11.1.24",
-    "@zalib/core": "^5.9.14",
+    "@zalib/core": "^5.9.16",
     "fastify": "5.8.5",
     "nestjs-pino": "4.6.1",
     "qs": "6.15.2",
@@ -60,8 +60,7 @@
   "devDependencies": {
     "@nestjs/testing": "11.1.25",
     "@types/qs": "6.15.1",
-    "@zalib/devkit": "^5.9.6",
-    "tsc-alias": "1.8.17"
+    "@zalib/devkit": "^5.9.6"
   },
   "lint-staged": {
     "package.json": "check-exact-package",

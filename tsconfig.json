@@ -20,9 +20,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "./dist",
-    "paths": {
-      "src/*": ["./src/*"]
-    },
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
