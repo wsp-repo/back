@@ -1,28 +1,33 @@
 import { FastifyInstance } from 'fastify';
 
-import { createRequestContext, getRequestContext } from '../requests/context';
+import { createLogger, Logger } from '../logger';
+import { createRequestContext } from '../requests/context';
 
-export function initRequestContext(fastify: FastifyInstance): void {
-  fastify.addHook('onRequest', async (request) => {
-    const ctx = await createRequestContext();
+export function initRequestContext(
+  fastify: FastifyInstance,
+  logger?: Logger,
+): void {
+  const localLogger = logger ?? createLogger('initRequestContext');
 
-    request.log.info({
-      requestId: ctx.requestId,
-      startedAt: ctx.startedAt,
+  fastify.addHook('onRequest', (request, _reply, done) => {
+    createRequestContext();
+
+    localLogger.info('Income request', {
+      method: request.method,
+      ip: request.ip,
+      url: request.url,
+      userAgent: request.headers['user-agent'],
+      query: request.query,
     });
+
+    done();
   });
 
-  fastify.addHook('onSend', async (request, reply, payload) => {
-    const ctx = getRequestContext();
+  fastify.addHook('onResponse', (_request, reply, done) => {
+    localLogger.info('Outcome response', {
+      statusCode: reply.statusCode,
+    });
 
-    if (ctx) {
-      request.log.info({
-        requestId: ctx.requestId,
-        statusCode: reply.statusCode,
-        durationMs: Date.now() - ctx.startedAt,
-      });
-    }
-
-    return payload;
+    done();
   });
 }

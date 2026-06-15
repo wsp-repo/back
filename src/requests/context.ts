@@ -5,28 +5,23 @@ export type RequestContext = {
   startedAt: number;
 };
 
-type RequestInitContext = Partial<Omit<RequestContext, 'startedAt'>>;
+type RequestInitContext = Omit<RequestContext, 'startedAt' | 'requestId'> &
+  Partial<Pick<RequestContext, 'requestId'>>;
 
 const requestContextStorage = new AsyncLocalStorage<RequestContext>();
 
 export function createRequestContext(
   requestInitContext?: RequestInitContext,
-): Promise<RequestContext> {
-  return new Promise((resolve) => {
-    const initStore: RequestContext = {
-      requestId: crypto.randomUUID(),
-      ...requestInitContext,
-      startedAt: Date.now(),
-    };
+): RequestContext {
+  const context: RequestContext = {
+    requestId: crypto.randomUUID(),
+    ...requestInitContext,
+    startedAt: Date.now(),
+  };
 
-    requestContextStorage.run(initStore, () => {
-      const store = requestContextStorage.getStore();
+  requestContextStorage.enterWith(context);
 
-      if (store) return resolve(store);
-
-      throw new Error();
-    });
-  });
+  return context;
 }
 
 export function getRequestContext(): RequestContext | undefined {

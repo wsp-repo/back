@@ -9,8 +9,6 @@ export function register(initializer: Initializer): void {
 }
 
 export function initDecorators(): void {
-  console.warn('initDecorators');
-
   if (initialized) return;
 
   for (const initializer of initializers) {

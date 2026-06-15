@@ -1,3 +1,3 @@
 export * from './createAdapter';
 export * from './createApplication';
-export * from './exitOnUnhandledError';
+export * from './registerShutdownOnUncaughtErrors';
