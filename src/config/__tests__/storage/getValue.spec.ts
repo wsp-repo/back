@@ -1,6 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { ConfigObject, ConfigStorage } from '../../storage';
+import {
+  ConfigObject,
+  addConfig,
+  getValue,
+  setReadyConfig,
+  cleanConfig,
+} from '../../storage';
 
 const obj = {
   arr: [1, 2, 3],
@@ -14,16 +20,25 @@ const obj = {
   str: '0',
 };
 
-describe('ConfigStorage', () => {
-  new ConfigStorage();
+describe('Config', () => {
+  describe('Storage', () => {
+    beforeEach(() => {
+      cleanConfig();
+      addConfig(obj as ConfigObject);
+    });
 
-  const storage = ConfigStorage.getInstance();
+    afterEach(cleanConfig);
 
-  storage.addConfig(obj as ConfigObject);
+    it('getValue - not ready', () => {
+      expect(() => getValue('arr')).throw();
+    });
 
-  it('getValue', () => {
-    expect(storage.getValue('arr.1')).toStrictEqual(obj.arr[1]);
-    expect(storage.getValue('arr2.0.o')).toStrictEqual(obj.arr2[0].o);
-    expect(storage.getValue('arr2.1')).toStrictEqual(obj.arr2[1]);
+    it('getValue - ready', () => {
+      setReadyConfig();
+
+      expect(getValue('arr.1')).toStrictEqual(obj.arr[1]);
+      expect(getValue('arr2.0.o')).toStrictEqual(obj.arr2[0].o);
+      expect(getValue('arr2.1')).toStrictEqual(obj.arr2[1]);
+    });
   });
 });

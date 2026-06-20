@@ -6,18 +6,16 @@ import { parse } from 'yaml';
 
 import { fsStatSafe, getRootPath } from '../../helpers';
 import { ConfigYamlError } from '../errors';
-import { ConfigObject, ConfigStorage } from '../storage';
+import { ConfigObject, addConfig } from '../storage';
 
 import { ConfigLoader } from '../types';
 
 const defaultFileName = 'config.default.yml';
 
 export class ConfigYamlFiles implements ConfigLoader {
-  private readonly storage = ConfigStorage.getInstance();
-
   private readonly rootPath = getRootPath();
 
-  constructor() {
+  public loadConfig(): void {
     this.getFiles().forEach((filePath) => {
       try {
         const configObject = parse(
@@ -31,7 +29,7 @@ export class ConfigYamlFiles implements ConfigLoader {
           throw new ConfigYamlError(filePath, message);
         }
 
-        this.storage.addConfig(configObject);
+        addConfig(configObject);
       } catch (error) {
         console.warn(error);
 

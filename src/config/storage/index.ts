@@ -1,91 +1,95 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Global, Injectable } from '@nestjs/common';
 import {
   mergeJsonObjects,
-  isDefined,
   isUndefined,
   JsonObject,
   MergeArrayModes,
+  isDefined,
 } from '@zalib/core';
 
 const regexpSplitPath = /(?:\.\[)|(?:\]\.)|(?:[\.\[\]])/g;
 
 export type ConfigObject = JsonObject;
 
-@Global()
-@Injectable()
-export class ConfigStorage {
-  private static instance: ConfigStorage;
+type StorageState = {
+  config: ConfigObject;
+  isReady?: true;
+};
 
-  private readonly storage: ConfigObject = {};
+let state: StorageState | undefined;
 
-  constructor() {
-    if (isDefined(ConfigStorage.instance)) {
-      throw new Error('ConfigStorage is initialized!');
-    }
+export function cleanConfig(): void {
+  state = undefined;
+}
 
-    ConfigStorage.instance = this;
+/**
+ * Добавить в конфиг секцию
+ */
+export function addConfig(config: ConfigObject): void {
+  if (state?.isReady) throw new Error('Config is ready');
+
+  if (isUndefined(state)) state = { config: {} };
+
+  mergeJsonObjects(state.config, config, {
+    mergeArray: MergeArrayModes.Replace,
+    mutate: true,
+  });
+}
+
+export function setReadyConfig(): void {
+  if (isDefined(state)) {
+    state.isReady = true;
+
+    return;
   }
 
-  public static getInstance(): ConfigStorage {
-    if (!ConfigStorage.instance) {
-      throw new Error('ConfigStorage not initialized!');
-    }
+  throw new Error('ConfigStorage empty config');
+}
 
-    return ConfigStorage.instance;
+/**
+ * Чтение значения конфига по пути
+ */
+export function getValue(path: string): unknown {
+  if (isUndefined(state?.isReady)) {
+    throw new Error('ConfigStorage not initialized!');
   }
 
-  /**
-   * Добавить в конфиг секцию
-   */
-  public addConfig(config: ConfigObject): void {
-    mergeJsonObjects(this.storage, config, {
-      mergeArray: MergeArrayModes.Replace,
-      mutate: true,
-    });
-  }
+  const parts = splitPath(path);
 
-  /**
-   * Чтение значения конфига по пути
-   */
-  public getValue(path: string): unknown {
-    const parts = this.splitPath(path);
+  let iterationValue: any = state.config;
 
-    let iterationValue: any = this.storage;
+  for (let i = 0; i < parts.length; i++) {
+    iterationValue = iterationValue?.[parts[i]];
 
-    for (let i = 0; i < parts.length; i++) {
-      iterationValue = iterationValue?.[parts[i]];
-
-      if (this.isUndefinedValue(iterationValue)) {
-        return undefined;
-      }
-    }
-
-    if (this.isUndefinedValue(iterationValue)) {
+    if (isUndefinedValue(iterationValue)) {
       return undefined;
     }
-
-    return iterationValue;
   }
 
-  /**
-   * Проверяет, что значение - эквивалент undefined
-   */
-  private isUndefinedValue(value?: unknown): boolean {
-    return isUndefined(value) || value === null;
+  if (isUndefinedValue(iterationValue)) {
+    return undefined;
   }
 
-  /**
-   * Возвращает массив пути
-   */
-  private splitPath(path: string): string[] {
-    const arr = path.split(regexpSplitPath);
+  return iterationValue;
+}
 
-    while (arr.length && !arr[arr.length - 1]) {
-      arr.length -= 1;
-    }
+/**
+ * Проверяет, что значение - эквивалент undefined
+ */
+function isUndefinedValue(value?: unknown): boolean {
+  return isUndefined(value) || value === null;
+}
 
-    return arr;
+/**
+ * Возвращает массив пути
+ */
+function splitPath(path: string): string[] {
+  const arr = path.split(regexpSplitPath);
+
+  while (arr.length && !arr[arr.length - 1]) {
+    arr.length -= 1;
   }
+
+  return arr;
 }

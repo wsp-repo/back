@@ -8,7 +8,7 @@ import {
 } from '@zalib/core';
 
 import { ConfigValueError } from '../errors';
-import { ConfigStorage } from '../storage';
+import { getValue } from '../storage';
 
 export type ConfigValueOptions<Schema extends TSchema> = {
   optional?: boolean;
@@ -43,7 +43,7 @@ export function getConfigValue<Schema extends TSchema>(
 ): StaticDecode<Schema> | undefined {
   const { optional, schema } = options;
 
-  const value = ConfigStorage.getInstance().getValue(path);
+  const value = getValue(path);
 
   if (isUndefined(value) && optional) return undefined;
 

@@ -10,7 +10,7 @@ import {
 } from '@zalib/core';
 
 import { ConfigEnvError } from '../errors';
-import { ConfigObject, ConfigStorage } from '../storage';
+import { ConfigObject, addConfig } from '../storage';
 
 import { ConfigLoader } from '../types';
 
@@ -20,11 +20,9 @@ const cfgPrefixString = 'APP__';
 const cfgPrefixLength = cfgPrefixString.length;
 
 export class ConfigEnvironments implements ConfigLoader {
-  readonly #configStorage = ConfigStorage.getInstance();
-
   readonly #configObject: any = {};
 
-  constructor() {
+  public loadConfig(): void {
     for (const configEnv of this.#getConfigEnvs()) {
       this.#setConfigValue(
         this.#getConfigPath(configEnv),
@@ -32,10 +30,7 @@ export class ConfigEnvironments implements ConfigLoader {
       );
     }
 
-    /* prettier-ignore */
-    this.#configStorage.addConfig(
-      this.#configObject as ConfigObject,
-    );
+    addConfig(this.#configObject as ConfigObject);
   }
 
   /**

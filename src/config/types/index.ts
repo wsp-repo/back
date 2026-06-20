@@ -1,7 +1,8 @@
 import { TSchema } from '@zalib/core';
 
-// eslint-disable-next-line
-export type ConfigLoader = {};
+export interface ConfigLoader {
+  loadConfig(): void;
+}
 
 export enum ConfigSources {
   Environments = 'environments',
