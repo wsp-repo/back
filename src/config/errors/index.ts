@@ -1,13 +1,15 @@
-import { CoreError } from '@zalib/core';
+import { CoreError, isDefined } from '@zalib/core';
 
 type BaseError = Pick<CoreError, 'message' | 'details'>;
 
 function getBaseError(error: unknown, details?: unknown): BaseError {
   // хак через каст вместо if-проверок
   const coreError = error as CoreError;
-  const message = coreError.message || String(error);
 
-  return { details: details || coreError.details, message };
+  return {
+    details: isDefined(details) ? details : coreError?.details,
+    message: coreError?.message || String(error),
+  };
 }
 
 export class ConfigValueError extends CoreError {

@@ -25,7 +25,7 @@ export async function createApplication(
 
   app.useGlobalFilters(new ApiExceptionFilter());
 
-  initRequestContext(useAdapter.getInstance());
+  initRequestContext(app);
 
   return app;
 }

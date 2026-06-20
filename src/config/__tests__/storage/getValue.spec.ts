@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { ConfigStorage } from '../../storage';
+import { ConfigObject, ConfigStorage } from '../../storage';
 
 const obj = {
   arr: [1, 2, 3],
@@ -19,7 +19,7 @@ describe('ConfigStorage', () => {
 
   const storage = ConfigStorage.getInstance();
 
-  storage.addConfig(obj);
+  storage.addConfig(obj as ConfigObject);
 
   it('getValue', () => {
     expect(storage.getValue('arr.1')).toStrictEqual(obj.arr[1]);

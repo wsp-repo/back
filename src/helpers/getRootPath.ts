@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'path';
 
-import { CoreError } from '@zalib/core';
+import { CoreError } from '@zalib/core/errors';
 import { isDefined } from '@zalib/core/helpers';
 
 import { fsStatSafe } from './fsStatSafe';

@@ -1,10 +1,10 @@
 import { Module, DynamicModule, OnModuleInit } from '@nestjs/common';
 
-import { initDecorators } from '../decorators/bootstrap';
-import { ConfigEnvironments, ConfigYamlFiles } from '../loaders';
-import { ConfigStorage } from '../storage';
+import { initDecorators } from './decorators/bootstrap';
+import { ConfigEnvironments, ConfigYamlFiles } from './loaders';
+import { ConfigStorage } from './storage';
 
-import { ConfigLoader, ConfigSources } from '../types';
+import { ConfigLoader, ConfigSources } from './types';
 
 let moduleInstanceCreated = false;
 

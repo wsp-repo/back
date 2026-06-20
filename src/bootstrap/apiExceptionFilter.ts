@@ -7,10 +7,6 @@ import {
 import { CoreError } from '@zalib/core/errors';
 import { FastifyReply } from 'fastify';
 
-function sendReplyError(reply: FastifyReply, error: CoreError): void {
-  reply.status(error.statusCode).send({ error, success: false });
-}
-
 class HttpError extends CoreError {
   public readonly statusCode: number;
 
@@ -27,11 +23,11 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const reply = host.switchToHttp().getResponse<FastifyReply>();
 
     if (exception instanceof CoreError) {
-      return sendReplyError(reply, exception);
+      return this.#sendReply(reply, exception);
     }
 
     if (exception instanceof HttpException) {
-      return sendReplyError(reply, new HttpError(exception));
+      return this.#sendReply(reply, new HttpError(exception));
     }
 
     const error =
@@ -39,6 +35,10 @@ export class ApiExceptionFilter implements ExceptionFilter {
         ? new CoreError(exception.message)
         : new CoreError(String(exception));
 
-    return sendReplyError(reply, error);
+    return this.#sendReply(reply, error);
+  }
+
+  #sendReply(reply: FastifyReply, error: CoreError): void {
+    reply.status(error.statusCode).send({ error, success: false });
   }
 }

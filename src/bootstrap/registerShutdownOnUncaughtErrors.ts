@@ -1,7 +1,6 @@
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { createLogger, Logger } from '../logger';
-import { LoggerWriter } from '../logger/writer';
 
 export function registerShutdownOnUncaughtErrors(
   app: NestFastifyApplication,
@@ -16,7 +15,7 @@ export function registerShutdownOnUncaughtErrors(
     localLogger.error('Unhandled Rejection:', error, reason);
 
     /* prettier-ignore */
-    await LoggerWriter.getInstance().flush().catch((err) => {
+    await localLogger.flush().catch((err) => {
       console.error('unhandledRejection logger.flush', err);
     });
 
@@ -27,7 +26,7 @@ export function registerShutdownOnUncaughtErrors(
     localLogger.error('Uncaught Exception:', error);
 
     /* prettier-ignore */
-    await LoggerWriter.getInstance().flush().catch((err) => {
+    await localLogger.flush().catch((err) => {
       console.error('uncaughtException logger.flush', err);
     });
 

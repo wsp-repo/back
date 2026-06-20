@@ -1,7 +1,7 @@
 import { PipeTransform } from '@nestjs/common';
 import {
   TSchema,
-  Static,
+  StaticDecode,
   TypeboxOptions,
   TypeboxValidator,
   createValidator,
@@ -19,7 +19,7 @@ export class TypeboxValidatorPipe<
     this.validator = createValidator(schema, options);
   }
 
-  public transform(value: unknown): Static<Schema> {
+  public transform(value: unknown): StaticDecode<Schema> {
     return this.validator.compile(value);
   }
 }
