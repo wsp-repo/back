@@ -2,7 +2,7 @@ import { TString, Type } from '@zalib/core';
 
 import { ConfigValueOptions, getConfigValue } from './value';
 
-const defaultStringSchema = Type.String();
+const defaultStringSchema = Type.String({ minLength: 1 });
 
 export type ConfigStringOptions = Partial<ConfigValueOptions<TString>>;
 

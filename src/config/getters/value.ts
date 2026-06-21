@@ -3,7 +3,6 @@ import {
   createValidator,
   deepClone,
   isUndefined,
-  TNullable,
   StaticDecode,
 } from '@zalib/core';
 
@@ -23,7 +22,12 @@ function validateValue<Schema extends TSchema>(
   schema: Schema,
   path: string,
 ): StaticDecode<Schema> | undefined {
-  const validator = createValidator(schema);
+  const validator = createValidator(schema, {
+    clean: true,
+    convert: true,
+    decode: true,
+    defaults: true,
+  });
 
   try {
     const result = validator.compile(deepClone(value));
@@ -47,7 +51,5 @@ export function getConfigValue<Schema extends TSchema>(
 
   if (isUndefined(value) && optional) return undefined;
 
-  const useSchema = optional ? TNullable(schema) : schema;
-
-  return validateValue(value, useSchema, path);
+  return validateValue(value, schema, path);
 }

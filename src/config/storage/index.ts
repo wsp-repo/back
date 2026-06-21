@@ -44,7 +44,7 @@ export function setReadyConfig(): void {
     return;
   }
 
-  throw new Error('ConfigStorage empty config');
+  throw new Error('Config is not defined');
 }
 
 /**
@@ -52,7 +52,7 @@ export function setReadyConfig(): void {
  */
 export function getValue(path: string): unknown {
   if (isUndefined(state?.isReady)) {
-    throw new Error('ConfigStorage not initialized!');
+    throw new Error('Config not initialized!');
   }
 
   const parts = splitPath(path);

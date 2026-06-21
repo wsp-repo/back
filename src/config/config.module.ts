@@ -23,6 +23,8 @@ export class ConfigModule {
     }
 
     try {
+      cleanConfig();
+
       for (const source of sources) {
         const loaderClass = loadersMap[source];
 
@@ -39,10 +41,7 @@ export class ConfigModule {
 
     moduleInstanceCreated = true;
 
-    return {
-      module: ConfigModule,
-      global: true,
-    };
+    return { module: ConfigModule };
   }
 
   public static isModuleCreated(): boolean {
