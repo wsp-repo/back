@@ -1,91 +1,99 @@
-import { CoreError } from '@zalib/core';
-
+import { getRequestContext, getRequestId } from '../../request/context';
 import { FORMATTERS } from '../formatters';
 
-import { LogFormats, LogRecord } from '../types';
+import { LogFormats, LogLevels } from '../types';
 
-export class LoggerWriter {
-  static #instance: LoggerWriter;
+import { LOG_LEVELS_NUMS } from '../constants';
 
-  #messagesBuffer: string[] = [];
-  #flushBuffer: (() => void)[] = [];
+export type WriteLogData = {
+  context: string;
+  details?: unknown;
+  error?: Error;
+  level: LogLevels;
+  message: string;
+};
 
-  #writingPromise: Promise<void> | undefined;
-  #writingProcess: boolean = false;
+const messagesBuffer: string[] = [];
+let flushBuffer: (() => void)[] = [];
 
-  private constructor() {
-    if (LoggerWriter.#instance) {
-      throw new CoreError('Singleton');
-    }
+let writingPromise: Promise<void> | undefined;
+let writingProcess: boolean = false;
 
-    LoggerWriter.#instance = this;
-  }
+export function writeLog(
+  data: WriteLogData,
+  format: LogFormats = LogFormats.Json,
+): void {
+  const formatter = FORMATTERS[format] ?? FORMATTERS[LogFormats.Json];
 
-  public static getInstance(): LoggerWriter {
-    if (!LoggerWriter.#instance) {
-      new LoggerWriter();
-    }
+  const requestContext = getRequestContext();
+  const requestTimeline = requestContext
+    ? Date.now() - requestContext.startedAt
+    : undefined;
 
-    return LoggerWriter.#instance;
-  }
+  const logMessage = formatter({
+    context: data.context,
+    details: data.details,
+    error: data.error,
+    level: LOG_LEVELS_NUMS[data.level],
+    levelName: String(data.level),
+    message: data.message,
+    requestId: getRequestId(),
+    pid: process.pid,
+    timeline: requestTimeline,
+    timestamp: Date.now(),
+  });
 
-  public write(data: LogRecord, format: LogFormats = LogFormats.Json): void {
-    const formatter = FORMATTERS[format] ?? FORMATTERS[LogFormats.Json];
+  messagesBuffer.push(logMessage);
+  writeStdout();
+}
 
-    this.#messagesBuffer.push(formatter(data));
-    this.#writeStdout();
-  }
-
-  /**
-   * Гарантирует запись сообщений, отправленных до вызова метода
-   */
-  public flush(): Promise<void> {
-    if (this.#messagesBuffer.length > 0) {
-      return new Promise<void>((resolve) => {
-        this.#flushBuffer.push(resolve);
-      });
-    }
-
-    if (this.#writingPromise) {
-      return this.#writingPromise;
-    }
-
-    return Promise.resolve();
-  }
-
-  async #writeStdout(): Promise<void> {
-    if (this.#writingProcess) return;
-
-    if (this.#messagesBuffer.length === 0) return;
-
-    this.#writingProcess = true;
-
-    const flushBuffer = this.#flushBuffer;
-    const writeMessage = this.#messagesBuffer.join('\n');
-
-    this.#messagesBuffer.length = 0; // можно мягко очистить
-    this.#flushBuffer = []; // обязательно пересоздание
-
-    this.#writingPromise = new Promise<void>((resolve) => {
-      process.stdout.write(writeMessage + '\n', () => resolve());
-    });
-
-    await this.#writingPromise;
-
-    // Если за время записи набралось
-    if (this.#messagesBuffer.length > 0) {
-      setImmediate(() => {
-        this.#writingProcess = false;
-        this.#writeStdout();
-      });
-    } else {
-      this.#writingProcess = false;
-    }
-
-    this.#writingPromise = undefined;
-
-    flushBuffer.forEach((resolve) => {
-      resolve();
+/**
+ * Гарантирует запись сообщений, отправленных до вызова метода
+ */
+export function flushLogs(): Promise<void> {
+  if (messagesBuffer.length > 0) {
+    return new Promise<void>((resolve) => {
+      flushBuffer.push(resolve);
     });
   }
+
+  if (writingPromise) return writingPromise;
+
+  return Promise.resolve();
+}
+
+async function writeStdout(): Promise<void> {
+  if (writingProcess) return;
+
+  if (messagesBuffer.length === 0) return;
+
+  writingProcess = true;
+
+  const writeFlushBuffer = flushBuffer;
+  const writeMessage = messagesBuffer.join('\n');
+
+  messagesBuffer.length = 0; // можно мягко очистить
+  flushBuffer = []; // обязательно полное пересоздание
+
+  writingPromise = new Promise<void>((resolve) => {
+    process.stdout.write(writeMessage + '\n', () => resolve());
+  });
+
+  await writingPromise;
+
+  // Если за время записи набралось
+  if (messagesBuffer.length > 0) {
+    setImmediate(() => {
+      writingProcess = false;
+      writeStdout();
+    });
+  } else {
+    writingProcess = false;
+  }
+
+  writingPromise = undefined;
+
+  writeFlushBuffer.forEach((resolve) => {
+    resolve();
+  });
 }

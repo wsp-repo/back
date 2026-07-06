@@ -1,14 +1,7 @@
-import { isDefined } from '@zalib/core';
-
-import { prepareError } from '../helpers/prepareError';
+import { toJsonObject } from '@zalib/core';
 
 import { LogRecord } from '../types';
 
 export function toJson(data: LogRecord): string {
-  /* prettier-ignore */
-  const error = isDefined(data.error)
-    ? prepareError(data.error)
-    : undefined;
-
-  return JSON.stringify({ ...data, error });
+  return JSON.stringify(toJsonObject(data));
 }

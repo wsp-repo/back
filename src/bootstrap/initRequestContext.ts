@@ -2,7 +2,7 @@ import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { CoreError, isObject } from '@zalib/core';
 
 import { createLogger, Logger } from '../logger';
-import { createRequestContext } from '../requests/context';
+import { createRequestContext } from '../request/context';
 
 export function initRequestContext(
   app: NestFastifyApplication,
